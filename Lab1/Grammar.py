@@ -11,7 +11,7 @@ class Grammar:
             for char in word:
                 if not self.char_is_terminal(char):
                     # print(word)
-                    production=self.pick_replacement(self.productions[char])
+                    production=self.__pick_replacement(self.productions[char])
                     word = word.replace(char,production)
                     # print(production)
         return word
@@ -23,22 +23,23 @@ class Grammar:
                 return False
         return True
 
-    def word_is_terminal(self,word:list)->bool:
-        for char in word:
-            if len(char)>1:
-                for ch in char:
-                    if ch in self.nonterminals:
-                        return False
-            elif char in self.nonterminals:
-                return False
-        return True
-
     def char_is_terminal(self,char:str)->bool:
         if char in self.nonterminals:
             return False
         return True
 
-    def pick_replacement(self,productions:list)->str:
+    def __pick_replacement(self,productions:list)->str:
         return random.choice(productions)
+
+
+    def generate_strings(self)->list:
+        ans=[]
+        while(len(ans)<5):
+            word = self.generate_string()
+            if word not in ans:
+                ans.append(word)
+        return ans
+
+    def to_finite_automation():
 
 

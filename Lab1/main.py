@@ -12,4 +12,4 @@ print(P)
 
 
 grammar = Grammar(VN,VT,P)
-print(grammar.generate_string())
+print(grammar.generate_strings())
