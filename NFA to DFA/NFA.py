@@ -25,6 +25,10 @@ class NFA:
         return transition_table
 
 
-    def df_trans_table(self):
+    def print_transition_df(self):
         df = pd.DataFrame(self.transition_table)
-        return df.T
+        print(df.T)
+
+    def print_transition_dict(self):
+        for state in self.transition_table:
+            print(state, self.transition_table[state])
