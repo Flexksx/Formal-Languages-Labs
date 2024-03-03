@@ -2,7 +2,7 @@ from Variant import Variant
 from Grammar import Grammar
 
 '''Get the variant from the restructured to json file'''
-variant = Variant('/home/cristi/Documents/GitHub/LabsLFA/Lab1/variant.json')
+variant = Variant('/Users/cristiancretu/Documents/UniCode/LabsLFA/Lab1/variant.json')
 VN = variant.getVN()
 VT = variant.getVT()
 P = variant.getP()
@@ -31,3 +31,4 @@ print(fa.string_belongs_to_language("a"))
 print(fa.string_belongs_to_language("ab"))
 print(fa.string_belongs_to_language("ba"))
 print(fa.string_belongs_to_language("FAFTOPCIK"))
+print(fa.string_belongs_to_language("abcabcaaaaaae"))
