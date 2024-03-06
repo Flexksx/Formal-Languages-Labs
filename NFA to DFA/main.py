@@ -12,3 +12,4 @@ delta=variant['delta']
 fa = FiniteAutomaton(Q,Sigma,Q[0],F,delta)
 
 print(fa.delta)
+print(fa.print_trans_table())
