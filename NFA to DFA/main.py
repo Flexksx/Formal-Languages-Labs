@@ -1,16 +1,14 @@
-from Variant import Variant
-from Transform import TransformNFAtoDFA
-from FiniteAutomation import FiniteAutomation
-from NFA import NFA
 from Grammar import Grammar
+from FiniteAutomaton import FiniteAutomaton
+from Variant import Variant
 
 variant = Variant().getVariant()
+Q=variant['Q']
+Sigma=variant['Sigma']
+F=variant['F']
+delta=variant['delta']
 
-Q = variant['Q']
-Sigma = variant["Sigma"]
-F = variant["F"]
-delta = variant["delta"]
-fa = FiniteAutomation(Q,Sigma,Q[0], F, delta)
 
-grm = fa.to_grammar()
-print(grm.productions)
+fa = FiniteAutomaton(Q,Sigma,Q[0],F,delta)
+
+print(fa.delta)

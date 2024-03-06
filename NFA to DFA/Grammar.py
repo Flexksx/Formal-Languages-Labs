@@ -1,6 +1,5 @@
 import random
-from FiniteAutomation import FiniteAutomation
-
+from FiniteAutomaton import FiniteAutomaton
 
 class Grammar:
     def __init__(self, _VN: list, _VT: list, _P: dict) -> None:
