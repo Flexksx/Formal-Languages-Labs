@@ -1,5 +1,3 @@
-from Grammar import Grammar
-
 class FiniteAutomation:
     def __init__(self) -> None:
         self.Q = []
@@ -25,14 +23,3 @@ class FiniteAutomation:
             else:
                 return False
         return state in self.F
-
-    def finite_automation_to_grammar(self):
-        VN = self.Q
-        VT = self.Sigma
-        P = {}
-        for state in self.delta:
-            for symbol in self.delta[state]:
-                if symbol not in P:
-                    P[symbol] = []
-                P[symbol].append(state + self.delta[state][symbol])
-        return Grammar(VN, VT, P)

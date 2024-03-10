@@ -43,31 +43,26 @@ class Grammar:
                 ans.append(word)
         return ans
 
-    '''This part transforms the Grammar into a Finite Automation object,
-    which can be used to check if a string belongs to the language of the grammar.
-    It follows the algorithm presented by Mrs. Cojuhari at the course.'''
+    def check_grammar_type(self) -> str:
+        """
+        Determines the type of the grammar based on its productions.
 
-    def to_finite_automation(self):
-        Q = self.nonterminals
-        Q.append("X")
-        Sigma = self.terminals
-        q0 = "S"
-        F = ["X"]
-        delta = {}
-        '''The delta function is a dictionary of dictionaries,
-        where the first key is the terminal'''
-        for terminal in self.productions:
-            for production in self.productions[terminal]:
+        Returns:
+            str: The type of the grammar. Possible values are:
+                - 'Type 3 - Unrestricted' for grammars with unrestricted productions.
+                - 'Type 2 - Context-free' for grammars with context-free productions.
+                - 'Type 1 - Context-sensitive' for grammars with context-sensitive productions.
+                - 'Type 0 - Regular' for grammars with regular productions.
+        """
+        # Check if all productions are in the form A -> a or A -> BC
+        for nonterminal, production in self.productions.items():
+            print(nonterminal, production)
+            if production == '':
+                return 'Type 3 - Unrestricted'
+            elif production[0] in self.nonterminals:
                 if len(production) > 1:
-                    transition = production[0]
-                    result_state = production[1]
-                    if terminal not in delta:
-                        delta[terminal] = {}
-                    delta[terminal][transition] = result_state
-                else:
-                    transition = production
-                    result_state = "X"
-                    if terminal not in delta:
-                        delta[terminal] = {}
-                    delta[terminal][transition] = result_state
-        return FiniteAutomation(Q, Sigma, q0, F, delta)
+                    if production[1] in self.terminals:
+                        return 'Type 2 - Context-free'
+                    elif production[1] in self.nonterminals:
+                        return 'Type 1 - Context-sensitive'
+        return 'Type 0 - Regular'

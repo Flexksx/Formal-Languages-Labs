@@ -1,15 +1,20 @@
-from Grammar import Grammar
-from FiniteAutomaton import FiniteAutomaton
+from Transformer import Transformer,FiniteAutomaton,Grammar
 from Variant import Variant
 
-variant = Variant().getVariant()
+variant = Variant('/home/flexksx/GitHub/LabsLFA/NFA to DFA/variant.json').getVariant()
 Q=variant['Q']
 Sigma=variant['Sigma']
 F=variant['F']
 delta=variant['delta']
 
 
-fa = FiniteAutomaton(Q,Sigma,Q[0],F,delta)
 
-print(fa.delta)
-print(fa.print_trans_table())
+nfa = FiniteAutomaton(Q=Q,Sigma=Sigma,F=F,delta=delta)
+transform = Transformer()
+
+g=transform.finite_automaton_to_grammar(nfa)
+
+
+# nfa.print_trans_table()
+dfa = transform.NFA_to_DFA(nfa)
+dfa.print_trans_table()
