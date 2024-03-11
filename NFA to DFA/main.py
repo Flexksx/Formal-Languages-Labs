@@ -1,12 +1,11 @@
 from Transformer import Transformer,FiniteAutomaton,Grammar
 from Variant import Variant
 
-variant = Variant('/home/flexksx/GitHub/LabsLFA/NFA to DFA/variant.json').getVariant()
+variant = Variant('/Users/cristiancretu/Documents/UniCode/LabsLFA/NFA to DFA/variant.json').getVariant()
 Q=variant['Q']
 Sigma=variant['Sigma']
 F=variant['F']
 delta=variant['delta']
-
 
 
 nfa = FiniteAutomaton(Q=Q,Sigma=Sigma,F=F,delta=delta)

@@ -1,7 +1,7 @@
 from Grammar import Grammar
 from Variant import Variant
 
-variant = Variant('/home/flexksx/GitHub/LabsLFA/Grammar and Finite Automaton/variant.json')
+variant = Variant('/Users/cristiancretu/Documents/UniCode/LabsLFA/Grammar and Finite Automaton/variant.json')
 terminals = variant.getVT()
 nonterminals = variant.getVN()
 productions = variant.getP()
