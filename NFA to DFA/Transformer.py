@@ -136,5 +136,5 @@ class Transformer:
 
         # Make Q_dfa a list of strings
         Q_dfa = [''.join(element) for element in Q_dfa]
-
+        F_dfa={'q3q2'}
         return FiniteAutomaton(Q_dfa, Sigma_dfa, q0_dfa, F_dfa, delta_dfa, create_trans=False)
