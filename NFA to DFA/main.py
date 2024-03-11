@@ -15,9 +15,12 @@ transform = Transformer()
 g=transform.finite_automaton_to_grammar(nfa)
 
 
-# nfa.print_trans_table()
+nfa.print_trans_table()
 dfa = transform.NFA_to_DFA(nfa)
-print(dfa.transition_table)
+print()
+dfa.print_trans_table()
 
 
 plot_automaton(dfa.transition_table)
+
+print(g.terminals,g.nonterminals,g.productions)
