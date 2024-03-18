@@ -63,7 +63,6 @@ class Tokenizer:
             Token("int_literal", r"\d+"),
             Token("float_literal", r"\d+\.\d+"),
             Token("string_literal", r'".*"'),
-            Token("comment", r'//.*')
         ]
 
     def tokenize(self, line):
@@ -84,7 +83,7 @@ class Tokenizer:
                 pattern = re.compile(token.value)
                 match = pattern.match(line, index)
                 if match and match.start() == index:
-                    tokens_found.append(token)
+                    tokens_found.append((token, match.group()))
                     index = match.end()  
                     match_found = True
                     break  
