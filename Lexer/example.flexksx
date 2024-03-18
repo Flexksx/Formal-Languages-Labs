@@ -1,4 +1,3 @@
-print "Hi!"
-for i in [0,1,2,3]{
-    print "Hi, mom!"
-}
+print("Hello")
+print("Hi world")
+while i<5 print("Hello world")
