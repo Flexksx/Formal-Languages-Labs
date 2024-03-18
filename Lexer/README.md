@@ -235,3 +235,6 @@ The tokenization of this code results in this output:
 [(for, 'for'), (lparen, '('), (identifier, 'i'), (assign, '='), (int_literal, '0'), (semicolon, ';'), (identifier, 'i'), (less, '<'), (int_literal, '5'), (semicolon, ';'), (identifier, 'i'), (plus, '+'), (assign, '='), (int_literal, '1'), (rparen, ')'), (lbrace, '{'), (print, 'print'), (lparen, '('), (quote, '"'), (identifier, 'Hello'), (identifier, 'world'), (quote, '"'), (rparen, ')'), (rbrace, '}')]
 ```
 Where, each token is put into the line it contains, and put into a set with the token type first and the token value second.
+
+## Conclusions
+The program successfully converted my custom written code into tokens that can be further used for future implementations. It used Regular Expressions used from a Python library to implement the identification of certain symbol patterns that represent tokens in order to achieve the desired tokenization.
