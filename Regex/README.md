@@ -16,7 +16,7 @@ However, mastering regular expressions requires understanding their syntax, meta
 
 ## Objectives:
 
-1.Write and cover what regular expressions are, what they are used for.
+1. Write and cover what regular expressions are, what they are used for.
 2. Take your variant code
 3. Write a code that will generate valid combinations of symbols conform given regular expressions (examples will be shown).
 4. In case you have an example, where symbol may be written undefined number of times, take a limit of 5 times (to evade generation of extremely long combinations)
@@ -35,14 +35,10 @@ def or_operator(options: list[str] = None):
 Here is the star operator:
 ```python
 def star_operator(symbol: str):
-    init_symbol = symbol
-    answer = ""
-    last_i = 0
-    for i in range(0, random.randint(0, infty)):
-        answer += symbol
-        last_i = i
-    print(f'Repeat {init_symbol} {last_i} times')
-    return symbol
+    times = random.randint(0, infty)
+    answer = symbol*times
+    print(f'Repeat {symbol} {times} times')
+    return answer
 ```
 
 After defining these functions, we can simply construct our Regular Expression based on the defined rules by adding the result of operators evaluation
@@ -119,3 +115,10 @@ Choose P from ['P', 'Q']
 Repeat P 3 times
 JJKLLOPPP
 ```
+
+## Conclusion
+In conclusion, this laboratory work provided valuable insights into regular expressions, emphasizing their role in pattern matching within text. Practical implementation involved creating custom functions for handling regex operators and generating valid symbol combinations. Exploring operators like *, +, |, ?, and ^ enhanced understanding of pattern definition and repetition control. Future enhancements could include supporting additional regex operators, optimizing code for efficiency, and implementing error handling mechanisms. Overall, this experience deepened comprehension of regex principles and their practical application, setting a foundation for further exploration in future projects.
+
+
+
+
