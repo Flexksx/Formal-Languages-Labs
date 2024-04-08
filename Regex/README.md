@@ -41,84 +41,90 @@ def star_operator(symbol: str):
     return answer
 ```
 
-After defining these functions, we can simply construct our Regular Expression based on the defined rules by adding the result of operators evaluation
+After defining these functions, we have to somehow parse the Regex notation to be able to perform these above mentioned operations on the rules specified.
+To do that, we search the notation for paranthesis so that we can find groups of symbols to choose from, and other symbols are represented as simple strings.
 ```python
-def first_regex():
-    "O(P|Q|R)+2(3|4)"
-    answer = ""
-    answer += const_operator("O")
-    choice = or_operator(["P", "Q", "R"])
-    answer += plus_operator(choice)
-    answer += "2"
-    answer += or_operator(["3", "4"])
-    return answer
-
-
-def second_regex():
-    "A*B(C|D|E)F(G|H|i)^2"
-    answer = ""
-    answer += star_operator("A")
-    answer += const_operator("B")
-    answer += or_operator(["C", "D", "E"])
-    answer += const_operator("F")
-    answer += n_operator(or_operator(["G", "H", "i"]), 2)
-    return answer
-
-
-def third_regex():
-    "J+K(L|M|N)*O?(P|Q)^3"
-    answer = ""
-    answer += plus_operator("J")
-    answer += const_operator("K")
-    answer += star_operator(or_operator(["L", "M", "N"]))
-    answer += question_operator("O")
-    answer += n_operator(or_operator(["P", "Q"]), 3)
-    return answer
-
-
-print("-------First regex-------")
-print(first_regex())
-print("-------Second regex------")
-print(second_regex())
-print("-------Third regex-------")
-print(third_regex())
+def parse_regex(regex):
+    operators = ['+', '*', '?', '^']  # List of operators
+    parentheses_stack = []
+    parts = []  
+    current_part = ''  
+    for char in regex:
+        if char == '(':
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            parentheses_stack.append(len(parts))
+        elif char == ')':
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            start = parentheses_stack.pop()
+            parts[start:] = [''.join(parts[start:])]
+        elif char in operators:
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            parts.append(char)
+        else:
+            current_part += char
+    if current_part:
+        parts.append(current_part)
+    return parts
 ```
 
-Which results in this output:
-#### First Regex $O(P|Q|R)^+2(3|4)$
+After that, we can proceed to traverse the parsed regex and perform the operations step by step to obtain the desired string.
+This function will take a part of the parsed Regex by one, and perform the necessary operations on it, and append them one over one to the final string obtained by the Regex.
+```python
+def compute_regex(parsed_regex: list[str] = None):
+    if parsed_regex is None:
+        return None
+    indices_to_skip = []
+    answer = ""
+    skipped_simbols = ["(", ")", "*", "+", "?", "^"]
+    for i in range(len(parsed_regex)):
+        if i in indices_to_skip:
+            continue
+        part = parsed_regex[i]
+        if part not in skipped_simbols:
+            if "|" in part:
+                current_token = or_operator(part.split("|"))
+            else:
+                current_token = part
+                print(f"Current Token: {current_token}")
+            if i+1 < len(parsed_regex):
+                next_part = parsed_regex[i+1]
+                if next_part == "*":
+                    answer += star_operator(current_token)
+                elif next_part == "+":
+                    answer += plus_operator(current_token)
+                elif next_part == "?":
+                    answer += question_operator(current_token)
+                elif next_part == "^":
+                    power = int(parsed_regex[i+2])
+                    answer += n_operator(current_token, power)
+                    indices_to_skip.append(i+2)
+                else:
+                    answer += current_token
+            else:
+                answer += current_token
+    return answer
+```
+
+## Execution
+The first Regex's execution would look like this: 
 ```bash
-Constant O
+Regex: O(P|Q|R)+2(3|4)
+Parsed Regex: ['O', 'P|Q|R', '+', '2', '3|4']
+Current Token: O
 Choose Q from ['P', 'Q', 'R']
 Repeat Q 2 times
-Constant 2
+Current Token: 2
 Choose 3 from ['3', '4']
-OQQ23
-```
-#### Second Regex $A^*B(C|D|E)F(G|H|i)^2$
-```bash
-Repeat A 5 times
-Constant B
-Choose D from ['C', 'D', 'E']
-Constant F
-Choose G from ['G', 'H', 'i']
-Repeat G 2 times
-AAAAABDFGG
-```
-#### Third Regex $J^+K(L|M|N)^*O?(P|Q)^3$
-```bash
-Repeat J 2 times
-Constant K
-Choose L from ['L', 'M', 'N']
-Repeat L 2 times
-Not Empty O
-Choose P from ['P', 'Q']
-Repeat P 3 times
-JJKLLOPPP
+Computed Regex: OQQ23
 ```
 
-## Conclusion
-In conclusion, this laboratory work provided valuable insights into regular expressions, emphasizing their role in pattern matching within text. Practical implementation involved creating custom functions for handling regex operators and generating valid symbol combinations. Exploring operators like *, +, |, ?, and ^ enhanced understanding of pattern definition and repetition control. Future enhancements could include supporting additional regex operators, optimizing code for efficiency, and implementing error handling mechanisms. Overall, this experience deepened comprehension of regex principles and their practical application, setting a foundation for further exploration in future projects.
+So we can see step by step the execution of the computation of the Regular Expression string.
 
-
-
-
+# Conclusion
+n conclusion, this laboratory work provided valuable insights into regular expressions, emphasizing their role in pattern matching within text. Practical implementation involved creating custom functions for handling regex operators and generating valid symbol combinations. Exploring operators like *,+, —, ?, and ˆ enhanced understanding of pattern definition and repetition control. Future enhancements could include supporting additional regex operators, optimizing code for efficiency, and implementing error handling mechanisms. Overall, this experience deepened comprehension of regex principles and their practical application, setting a foundation for further exploration in future projects.

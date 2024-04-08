@@ -45,7 +45,7 @@ def const_operator(symbol: str):
     return symbol
 
 
-def first_regex():
+def first_regex_gen():
     "O (P|Q|R)+ 2 (3|4)"
     answer = ""
     answer += const_operator("O")
@@ -55,7 +55,7 @@ def first_regex():
     return answer
 
 
-def second_regex():
+def second_regex_gen():
     "A* B (C|D|E) F (G|H|i)^2"
     answer = ""
     answer += star_operator("A")
@@ -66,7 +66,7 @@ def second_regex():
     return answer
 
 
-def third_regex():
+def third_regex_gen():
     "J+ K (L|M|N)* O? (P|Q)^3"
     answer = ""
     answer += plus_operator("J")
@@ -77,9 +77,80 @@ def third_regex():
     return answer
 
 
-print("-------First regex-------")
-print(first_regex())
-print("-------Second regex------")
-print(second_regex())
-print("-------Third regex-------")
-print(third_regex())
+def parse_regex(regex):
+    operators = ['+', '*', '?', '^']  # List of operators
+    parentheses_stack = []
+    parts = []
+
+    current_part = ''
+
+    for char in regex:
+        if char == '(':
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            parentheses_stack.append(len(parts))
+        elif char == ')':
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            start = parentheses_stack.pop()
+            parts[start:] = [''.join(parts[start:])]
+        elif char in operators:
+            if current_part:
+                parts.append(current_part)
+                current_part = ''
+            parts.append(char)
+        else:
+            current_part += char
+
+    if current_part:
+        parts.append(current_part)
+
+    return parts
+
+
+def compute_regex(parsed_regex: list[str] = None):
+    if parsed_regex is None:
+        return None
+    indices_to_skip = []
+    answer = ""
+    skipped_simbols = ["(", ")", "*", "+", "?", "^"]
+    for i in range(len(parsed_regex)):
+        if i in indices_to_skip:
+            continue
+        part = parsed_regex[i]
+        if part not in skipped_simbols:
+            if "|" in part:
+                current_token = or_operator(part.split("|"))
+            else:
+                current_token = part
+                print(f"Current Token: {current_token}")
+            if i+1 < len(parsed_regex):
+                next_part = parsed_regex[i+1]
+                if next_part == "*":
+                    answer += star_operator(current_token)
+                elif next_part == "+":
+                    answer += plus_operator(current_token)
+                elif next_part == "?":
+                    answer += question_operator(current_token)
+                elif next_part == "^":
+                    power = int(parsed_regex[i+2])
+                    answer += n_operator(current_token, power)
+                    indices_to_skip.append(i+2)
+                else:
+                    answer += current_token
+            else:
+                answer += current_token
+    return answer
+
+
+regexes = ["O(P|Q|R)+2(3|4)", "J+K(L|M|N)*O?(P|Q)^3", "A*B(C|D|E)F(G|H|i)^2"]
+
+
+for regex in regexes:
+    print(f"Regex: {regex}")
+    parsed_regex = parse_regex(regex)
+    print(f"Parsed Regex: {parsed_regex}")
+    print(f"Computed Regex: {compute_regex(parsed_regex)}")
+    print("\n")
