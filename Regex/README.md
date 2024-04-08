@@ -110,7 +110,7 @@ def compute_regex(parsed_regex: list[str] = None):
                 answer += current_token
     return answer
 ```
-
+This function makes the difference between a group of symbols to choose from and simple symbols, and looks at the next symbol in list to see if there is some operation that is needed to perform. Also, for the power operator, it will select as power the part next to the next part and include it into a list of indices to avoid, so that it would not pass over that symbol again and not append it as a single letter.
 ## Execution
 The first Regex's execution would look like this: 
 ```bash
