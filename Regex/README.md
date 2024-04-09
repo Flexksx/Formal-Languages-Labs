@@ -32,6 +32,8 @@ def or_operator(options: list[str] = None):
     print(f'Choose {symbol}')
     return symbol
 ```
+The OR operator would perform an operation on a group of symbols and randomly choose one symbol from a list of those. For example, giving it a list of ['P','Q','R'], it will choose one of those. In a Regular Expression, this would be noted as (P|Q|R), so you choose one of them.
+
 Here is the star operator:
 ```python
 def star_operator(symbol: str):
@@ -40,6 +42,12 @@ def star_operator(symbol: str):
     print(f'Repeat {symbol} {times} times')
     return answer
 ```
+The $*$ - STAR operator means that a symbol can be repeated 0 or an infinite times. In this laboratory work, the ```infty``` variable is a global one and is set to 5, so that we can represent the Regular Expression correctly and will not get too many repeating symbols.
+
+Other operators are:
+* $+$ - symbol is allowed to be repeated 1 or an infinity amount of times.
+* $\^{}x$ - symbol should be repeated x times consecutively.
+* $?$ - symbol may or may not appear. My implementation just randomly assigns a truth value that represents whether or not the symbol is included or not.
 
 After defining these functions, we have to somehow parse the Regex notation to be able to perform these above mentioned operations on the rules specified.
 To do that, we search the notation for paranthesis so that we can find groups of symbols to choose from, and other symbols are represented as simple strings.
@@ -88,11 +96,14 @@ def compute_regex(parsed_regex: list[str] = None):
         part = parsed_regex[i]
         if part not in skipped_simbols:
             if "|" in part:
+                #Here we check if this part is a group of symbols to choose from, and if so, we randomly choose one of those
                 current_token = or_operator(part.split("|"))
             else:
+                # Otherwise, we just take the current symbol
                 current_token = part
                 print(f"Current Token: {current_token}")
             if i+1 < len(parsed_regex):
+                # Then we look which operation follows the current token
                 next_part = parsed_regex[i+1]
                 if next_part == "*":
                     answer += star_operator(current_token)
@@ -101,6 +112,7 @@ def compute_regex(parsed_regex: list[str] = None):
                 elif next_part == "?":
                     answer += question_operator(current_token)
                 elif next_part == "^":
+                    # We will skip later the symbol that follows the ^ operator, since we don't want to process it as a separate symbol.
                     power = int(parsed_regex[i+2])
                     answer += n_operator(current_token, power)
                     indices_to_skip.append(i+2)
