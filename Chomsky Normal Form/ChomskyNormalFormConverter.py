@@ -13,7 +13,6 @@ class ChomskyNormalFormConverter:
         print(new_production)
         empty_productions = self.__find_initial_epsilon_productions(productions=self.grammar.productions)
         new_production = self.__derive_epsilon_productions(productions=new_production, empty_found=empty_productions)
-        print(empty_productions)
         print(new_production)
         
     def __replace_starting_non_terminal(self, productions:dict=None):
@@ -36,27 +35,30 @@ class ChomskyNormalFormConverter:
             options = productions[symbol]
             if len(options)>1:
                 for result in options:
-                    if result == 'empty':
+                    if result == 'empty' or result=='$':
                         # Let's denote empty strings with a dollar symbol cuz why not
-                        productions[symbol]='$'
+                        productions[symbol]=['$']
                         empty_productions.update({symbol:result})
-                        print(f'Found production {symbol} -> {result}')
+                        print(f'Found epsilon production {symbol} -> {result}')
         return empty_productions 
  
 
     def __derive_epsilon_productions(self, productions:dict=None, empty_found:dict=None):
         for symbol in productions:
-            prossible_productions = productions[symbol]
-            print(f'{symbol} ->')
-            if len(prossible_productions)>1:
-                for result in prossible_productions:
-                    print(f'{result}')
-                    
-                    
-    def __derive_production_from_symbol(self,productions:dict=None, to_replace:str=None):
-        pass 
-
-
+            possible_productions = productions[symbol]
+            if len(possible_productions)>1:
+                for result in possible_productions:
+                    for production_symbol in result:
+                        if production_symbol in list(empty_found.keys()):
+                            new_production = result.replace(production_symbol,'$')
+                            productions[symbol].append(new_production)
+            else:
+                result = possible_productions[0]
+                for symbol in result:
+                    if symbol in empty_found:
+                        new_production=result.replace(symbol,'$')
+                        productions[symbol].append(new_production)
+        return productions
 
 
 
