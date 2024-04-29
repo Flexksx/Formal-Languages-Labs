@@ -1,11 +1,14 @@
 import random
 
 class Grammar:
-    def __init__(self, non_terminals:list[str] = None, terminals:list[str]=None,productions:dict[str]=None) -> None:
+    def __init__(self, non_terminals:list[str] = None, terminals:list[str]=None,productions:dict[str]=None, start_symbol:str=None) -> None:
         self.nonterminals = non_terminals
         self.terminals = terminals
         self.productions = productions
-
+        if start_symbol is None:
+            self.start_symbol = "S"
+        else:
+            self.start_symbol = start_symbol
     '''
     This generates a string that belongs to the language of the grammar. If
     a terminal has more than one production, it will choose one at random.
@@ -32,7 +35,11 @@ class Grammar:
         return True
 
     def __pick_replacement(self, productions: list) -> str:
-        return random.choice(productions)
+        replacement = random.choice(productions)
+        while replacement =="$":
+            replacement = random.choice(productions)
+        return replacement
+        
 
     def generate_strings(self) -> list:
         ans = []
@@ -65,3 +72,9 @@ class Grammar:
                     elif production[1] in self.nonterminals:
                         return 'Type 1 - Context-sensitive'
         return 'Type 0 - Regular'
+    
+    def __repr__(self) -> str:
+        production_string = ""
+        for key, value in self.productions.items():
+            production_string += f"{key} -> {value}\n"
+        return f"""Vn={self.nonterminals}\nVt={self.terminals}\nStart_symbol={self.start_symbol}\nProductions=\n{production_string}"""

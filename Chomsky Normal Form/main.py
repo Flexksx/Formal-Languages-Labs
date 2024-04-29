@@ -1,17 +1,24 @@
 from ChomskyNormalFormConverter import ChomskyNormalFormConverter
 from Variant import Variant
 from Grammar import Grammar
+from UnitTests import TestGrammar
 
-
-
-variant = Variant('/home/flexksx/Documents/Labs/LabsLFA/Chomsky Normal Form/variant.json')
+variant = Variant(
+    '/Users/cristiancretu/Documents/UniCode/LFA/Chomsky Normal Form/variant.json')
 production = variant.getP()
 terminals = variant.getVT()
 non_terminals = variant.getVN()
-# print(production)
-# print(terminals)
-# print(non_terminals)
 
-grammar = Grammar(terminals=terminals, non_terminals=non_terminals, productions=production)
+grammar = Grammar(terminals=terminals,
+                  non_terminals=non_terminals, productions=production)
 converter = ChomskyNormalFormConverter(grammar)
-converter.remove_epsilon_production()
+
+print(grammar)
+
+test = TestGrammar(grammar=grammar, converter=converter)
+test.run()
+print("All tests passed",end="\n\n")
+
+new_grammar = converter.transform()
+print(new_grammar)
+

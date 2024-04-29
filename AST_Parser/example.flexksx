@@ -1,0 +1,5 @@
+print("Hello");
+print("Hi world");
+for(i=0;i<5;i+=1){
+    print("Hello world");
+}

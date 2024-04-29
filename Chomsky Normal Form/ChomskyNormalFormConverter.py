@@ -1,80 +1,45 @@
 from Grammar import Grammar
 from Variant import Variant
-
-
+from Start import StartOperation
+from Term import TermOperation
+from Bin import BinOperation
+from Del import DelOperation
+from Unit import UnitOperation
 class ChomskyNormalFormConverter:
+    def __init__(self, grammar: Grammar) -> None:
+        self.grammar = grammar
     
-    def __init__(self, grammar_to_convert:Grammar) -> None:
-        self.grammar:Grammar = grammar_to_convert
-        
-       
-    def remove_epsilon_production(self):
-        new_production = self.__replace_starting_non_terminal(productions=self.grammar.productions)
-        print(new_production)
-        empty_productions = self.__find_initial_epsilon_productions(productions=self.grammar.productions)
-        new_production = self.__derive_epsilon_productions(productions=new_production, empty_found=empty_productions)
-        print(new_production)
-        
-    def __replace_starting_non_terminal(self, productions:dict=None):
-        """This function replaces the starting non-terminal with a new non-terminal
-        ----------
-        Args:
-            productions (dict, optional): This is the dictionary that contains the productions. Defaults to None.
-        ----------
-        Returns:
-            dict: For the ease of use and clearness, this function adds a T instead of S0 and will will make it to produce S.
-        """
-        starting = "S"
-        new_starting = "T"
-        productions[new_starting] = [starting]
-        return productions
+    def transform(self):
+        S = 'S'
+        P = self.grammar.productions
+        Vn = self.grammar.nonterminals
+        Vt = self.grammar.terminals
+        P, S, Vn = StartOperation.do(P=P, S=S, Vn=Vn)
+        P = DelOperation.do(P=P, S=S, Vn=Vn)
+        P = UnitOperation.do(P=P, Vn=Vn, Vt=Vt)
+        P = TermOperation.do(P=P, S=S, Vn=Vn, Vt=Vt)
+        P = BinOperation.do(P=P, Vn=Vn)
+        P, Vn = self.remove_inaccessible_symbols(P, S, Vn)
+        return Grammar(non_terminals=Vn, terminals=Vt, productions=P, start_symbol=S)
+
+    def remove_inaccessible_symbols(self, P: dict[str, list[str]], S: str, Vn: list[str]) -> tuple[dict[str, list[str]], list[str]]:
+        accessible = {S}
+        queue = [S]
+
+        while queue:
+            current = queue.pop(0)
+            for production in P.get(current, []):
+                for symbol in production:
+                    if symbol in Vn and symbol not in accessible:
+                        accessible.add(symbol)
+                        queue.append(symbol)
+
+        Vn = [nt for nt in Vn if nt in accessible]
+        new_P = {nt: P[nt] for nt in P if nt in accessible}
+
+        return new_P, Vn
+
+
+
     
-    def __find_initial_epsilon_productions(self, productions:dict=None):
-        empty_productions = {}
-        for symbol in productions:
-            options = productions[symbol]
-            if len(options)>1:
-                for result in options:
-                    if result == 'empty' or result=='$':
-                        # Let's denote empty strings with a dollar symbol cuz why not
-                        productions[symbol]=['$']
-                        empty_productions.update({symbol:result})
-                        print(f'Found epsilon production {symbol} -> {result}')
-        return empty_productions 
- 
 
-    def __derive_epsilon_productions(self, productions:dict=None, empty_found:dict=None):
-        for symbol in productions:
-            possible_productions = productions[symbol]
-            if len(possible_productions)>1:
-                for result in possible_productions:
-                    for production_symbol in result:
-                        if production_symbol in list(empty_found.keys()):
-                            new_production = result.replace(production_symbol,'$')
-                            productions[symbol].append(new_production)
-            else:
-                result = possible_productions[0]
-                for symbol in result:
-                    if symbol in empty_found:
-                        new_production=result.replace(symbol,'$')
-                        productions[symbol].append(new_production)
-        return productions
-
-
-
-
-
-
- 
-        
-variant = Variant('/home/flexksx/Documents/Labs/LabsLFA/Chomsky Normal Form/variant.json')
-production = variant.getP()
-terminals = variant.getVT()
-non_terminals = variant.getVN()
-# print(production)
-# print(terminals)
-# print(non_terminals)
-
-grammar = Grammar(terminals=terminals, non_terminals=non_terminals, productions=production)
-converter = ChomskyNormalFormConverter(grammar)
-converter.remove_epsilon_production()
