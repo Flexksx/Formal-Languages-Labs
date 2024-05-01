@@ -42,5 +42,5 @@ class Lexer:
         """
         self.tokenize()
         for line in self.tokens:
-            print(line)
+            print(line,end="\n")
         

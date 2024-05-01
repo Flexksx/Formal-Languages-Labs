@@ -1,4 +1,4 @@
-# Laboratory Work Nr.3 Lexer & Scanner
+# Laboratory Work Nr.6 Abstract Syntax Tree Parsing
 
 ### Course: Formal Languages & Finite Automata
 ### Author: Cretu Cristian
@@ -6,235 +6,181 @@
 ----
 
 ## Theory
-The term lexer comes from lexical analysis which, in turn, represents the process of extracting lexical tokens from a string of characters. There are several alternative names for the mechanism called lexer, for example tokenizer or scanner. The lexical analysis is one of the first stages used in a compiler/interpreter when dealing with programming, markup or other types of languages.     The tokens are identified based on some rules of the language and the products that the lexer gives are called lexemes. So basically the lexer is a stream of lexemes. Now in case it is not clear what's the difference between lexemes and tokens, there is a big one. The lexeme is just the byproduct of splitting based on delimiters, for example spaces, but the tokens give names or categories to each lexeme. So the tokens don't retain necessarily the actual value of the lexeme, but rather the type of it and maybe some metadata.
+An abstract syntax tree (AST) is a data structure used in computer science to represent the structure of a program or code snippet. It is a tree representation of the abstract syntactic structure of text (often source code) written in a formal language. Each node of the tree denotes a construct occurring in the text. 
+It is sometimes called just a syntax tree. The syntax is "abstract" in the sense that it does not represent every detail appearing in the real syntax, but rather just the structural or content-related details. 
+For instance, grouping parentheses are implicit in the tree structure, so these do not have to be represented as separate nodes. Likewise, a syntactic construct like an if-condition-then statement may be denoted by means of a single node with three branches. 
+This distinguishes abstract syntax trees from concrete syntax trees, traditionally designated parse trees. Parse trees are typically built by a parser during the source code translation and compiling process. 
+Once built, additional information is added to the AST by means of subsequent processing, e.g., contextual analysis. Abstract syntax trees are also used in program analysis and program transformation systems. 
+Abstract syntax trees are data structures widely used in compilers to represent the structure of program code. An AST is usually the result of the syntax analysis phase of a compiler. 
+It often serves as an intermediate representation of the program through several stages that the compiler requires, and has a strong impact on the final output of the compiler.
 
 ## Objectives:
-1. Understand what lexical analysis is.
-2. Get familiar with the inner workings of a lexer/scanner/tokenizer.
-3. Implement a sample lexer and show how it works.
-
+1. Get familiar with parsing, what it is and how it can be programmed.
+2. Get familiar with the concept of AST.
+3. In addition to what has been done in the 3rd lab work do the following:
+   1. In case you didn't have a type that denotes the possible types of tokens you need to:
+      1. Have a type ```TokenType``` (like an enum) that can be used in the lexical analysis to categorize the tokens. 
+      2. Please use regular expressions to identify the type of the token.
+   2. Implement the necessary data structures for an AST that could be used for the text you have processed in the 3rd lab work.
+   3. Implement a simple parser program that could extract the syntactic information from the input text.
 
 
 ## Implementation description
 
-#### Token Class:
-A class that represents a token in the language I try to tokenize.
-I overload the built in functions so that I can easily manipulate tokens.
+#### ```TokenType``` Class:
+```TokenType``` is an enumeration class representing different types of tokens in a markup language. It defines token types such as document open and close, title open and close, chapter open and close, subchapter open and close, name open and close, math equation open and close, and content.
 ```python
-class Token:
-    """
-    Represents a token in a lexer.
+import enum
 
-    Attributes:
-        - type (str): The type of the token.
-        - value (str): The value of the token.
-    """
+class TokenType(enum.Enum):
+    DOCUMENT_OPEN = 1
+    DOCUMENT_CLOSE = 2
+    TITLE_OPEN = 3
+    TITLE_CLOSE = 4
+    CHAPTER_OPEN = 5
+    CHAPTER_CLOSE = 6
+    SUBCHAPTER_OPEN = 7
+    SUBCHAPTER_CLOSE = 8
+    CONTENT = 9
 
-    def __init__(self, type, value):
+    def __eq__(self, value: object) -> bool:
+        return super().__eq__(value)
+```
+#### Lexer
+After that, we need a Lexer, or a simpler implementation of it using a simple function. 
+The function ```lexer``` tokenizes a given markdown text into a list of tokens. It initializes an empty list to store the tokens. It iterates through the markdown text while there are still characters remaining. Within each iteration, it strips leading and trailing whitespace from the markdown text. 
+It attempts to match the markdown text with predefined token regular expressions. If a match is found, it extracts the matched value, appends the token type and value tuple to the tokens list, and updates the markdown text to exclude the matched portion. 
+If no match is found, it raises a SyntaxError indicating an unknown markdown syntax. Finally, it returns the list of tokens representing the tokenized markdown text.
+```python
+def lexer(markdown):
+    tokens = []
+    while markdown:
+        markdown = markdown.strip()
+        match_found = False
+        for token_type, token_regex in TOKENS:
+            regex = re.compile(token_regex)
+            match = regex.match(markdown)
+            if match:
+                value = match.group(0).strip()
+                tokens.append((token_type, value))
+                markdown = markdown[match.end():]
+                match_found = True
+                break
+        if not match_found:
+            raise SyntaxError(f'Unknown markdown: {markdown}')
+    return tokens
+```
+#### Tokens
+The tokens represent structural elements and content within a markdown document. 
+Each token consists of a token type and a corresponding value. The token types include DOCUMENT_OPEN and DOCUMENT_CLOSE for marking the beginning and end of the document respectively. 
+Additionally, there are tokens such as TITLE_OPEN, TITLE_CLOSE, CHAPTER_OPEN, CHAPTER_CLOSE, SUBCHAPTER_OPEN, and SUBCHAPTER_CLOSE for defining hierarchical sections within the document. 
+Finally, the CONTENT token captures any content that does not match the structural tokens, allowing for flexible text representation within the markdown document.
+```python
+TOKENS = [
+    (TokenType.DOCUMENT_OPEN, r'\[document\]'),
+    (TokenType.DOCUMENT_CLOSE, r'\[/document\]'),
+    (TokenType.TITLE_OPEN, r'\[title\]'),
+    (TokenType.TITLE_CLOSE, r'\[/title\]'),
+    (TokenType.CHAPTER_OPEN, r'\[chapter\]'),
+    (TokenType.CHAPTER_CLOSE, r'\[/chapter\]'),
+    (TokenType.SUBCHAPTER_OPEN, r'\[subchapter\]'),
+    (TokenType.SUBCHAPTER_CLOSE, r'\[/subchapter\]'),
+    (TokenType.CONTENT, r'[^\[\]]*'),  # Match any content not containing '[' or ']'
+]
+```
+#### Abstract Syntax Tree Node Class
+The ASTNode class represents a node in an abstract syntax tree (AST), commonly used for structured data representation in parsing tasks. 
+It encapsulates essential attributes such as the node type, value, and children nodes. 
+The constructor initializes these attributes, allowing flexibility in specifying node properties during instantiation. 
+The ```__repr__``` method provides a string representation of the node, including its type, value, and children nodes, facilitating debugging and visualization of the AST structure.
+```python
+class ASTNode:
+    def __init__(self, type, children=None, value=None):
         self.type = type
         self.value = value
-        
+        self.children = children if children is not None else []
+
     def __repr__(self):
-        return f"{self.type}"
-    
-    def __str__(self):
-        return f"{self.type}"
-    
-    def __eq__(self, other):
-        return self.type == other.type and self.value == other.value
-    
-    def __ne__(self, other):
-        return not self.__eq__(other)
-    
-    def __hash__(self):
-        return hash((self.type, self.value))
-    
-    def __lt__(self, other):
-        return self.type < other.type and self.value < other.value
-
+        type_name = self.type.name if isinstance(self.type, enum.Enum) else self.type
+        return f"{type_name}({self.value}, {self.children})"
 ```
 
 
-#### Tokenizer Class:
-This class is responsible for tokenizing a line of code and matching it to tokens while preserving the identifiers in the code. 
+#### Parser Class
+
+The Parser class orchestrates the parsing of markdown tokens, facilitating the construction of an abstract syntax tree (AST) representing the document structure. 
+It encapsulates state variables such as the current node being processed and a stack to manage the document's hierarchical layout efficiently. 
+By invoking the parse method, the class initializes the parsing process by setting up the root node and iteratively processes each token to construct the AST. 
+The handle_token method delegates the processing of individual tokens based on their type, ensuring the appropriate actions are taken for each. 
+For example, when encountering a chapter opening token, the handle_chapter_open method is invoked to add the chapter node to the AST and update the current node accordingly. 
+This class abstracts away the intricacies of parsing markdown documents, promoting maintainability and extensibility of the parsing logic. 
+Through its modular design, it enhances code readability and facilitates future enhancements or modifications to the parsing process.
 ```python
-from Token import Token
-import re
-
-
-class Tokenizer:
-    """
-    A class that tokenizes a given line of code based on predefined tokens.
-
-    Attributes:
-        - tokens (list): A list of Token objects representing the predefined tokens.
-
-    Methods:
-        - tokenize(line): Tokenizes the given line of code and returns a list of tokens found.
-        - get_tokens(): Returns the list of predefined tokens.
-        - print_tokens(): Prints the list of predefined tokens.
-    """
-
+class Parser:
     def __init__(self):
-        self.tokens = [
-            Token("int", r"\bint\b"),
-            Token("float", r"\bfloat\b"),
-            Token("string", r"\bstring\b"),
-            Token("bool", r"\bbool\b"),
-            Token("true", r"\btrue\b"),
-            Token("false", r"\bfalse\b"),
-            Token("if", r"\bif\b"),
-            Token("else", r"\belse\b"),
-            Token("while", r"\bwhile\b"),
-            Token("for", r"\bfor\b"),
-            Token("return", r"\breturn\b"),
-            Token("break", r"\bbreak\b"),
-            Token("continue", r"\bcontinue\b"),
-            Token("function", r"\bfun\b"),
-            Token("print", r"\bprint\b"),
-            Token("lparen", r"\("),
-            Token("rparen", r"\)"),
-            Token("lbrace", r"\{"),
-            Token("rbrace", r"\}"),
-            Token("lbracket", r"\["),
-            Token("rbracket", r"\]"),
-            Token("comma", r","),
-            Token("semicolon", r";"),
-            Token("colon", r":"),
-            Token("dot", r"\."),
-            Token("plus", r"\+"),
-            Token("minus", r"-"),
-            Token("multiply", r"\*"),
-            Token("divide", r"/"),
-            Token("modulus", r"%"),
-            Token("assign", r"="),
-            Token("equal", r"=="),
-            Token("not_equal", r"!="),
-            Token("greater", r">"),
-            Token("less", r"<"),
-            Token("greater_equal", r">="),
-            Token("less_equal", r"<="),
-            Token("quote", r'"'),
-            Token("single_quote", r"'"),
-            Token("and", r"&&"),
-            Token("or", r"\|\|"),
-            Token("not", r"!"),
-            Token("identifier", r"[a-zA-Z_][a-zA-Z0-9_]*"),
-            Token("int_literal", r"\d+"),
-            Token("float_literal", r"\d+\.\d+"),
-            Token("string_literal", r'".*"'),
-            Token("comment", r'//.*')
-        ]
+        self.root = None
+        self.current_node = None
+        self.stack = []
 
-    def tokenize(self, line):
-        """
-        Tokenizes a line of code by matching substrings against predefined token regular expressions.
-        Iterates through each character, attempting to match tokens.
-        Appends matched tokens to the list and updates the index.
+    def parse(self, tokens):
+        self.root = ASTNode(TokenType.DOCUMENT_OPEN, value="ROOT")
+        self.current_node = self.root
+        self.stack = [self.root]
 
-        Args:
-            - line (str): The line of code to be tokenized.
+        for token_type, value in tokens:
+            self.handle_token(token_type, value)
 
-        Returns:
-            - list: A list of Token objects representing the tokens found in the line of code.
-        """
-        tokens_found = []
-        index = 0  
-        while index < len(line):
-            match_found = False
-            for token in self.tokens:
-                pattern = re.compile(token.value)
-                match = pattern.match(line, index)
-                if match and match.start() == index:
-                    tokens_found.append((token, match.group()))
-                    index = match.end()  
-                    match_found = True
-                    break  
-            if not match_found:
-                index += 1
-        return tokens_found
-    
+        return self.root
 
-    def get_tokens(self):
-        """
-        Returns the list of predefined tokens.
+    def handle_token(self, token_type, value):
+        if token_type == TokenType.CHAPTER_OPEN:
+            self.handle_chapter_open()
+        elif token_type == TokenType.SUBCHAPTER_OPEN:
+            self.handle_subchapter_open()
+        elif token_type == TokenType.TITLE_OPEN:
+            self.handle_title_open()
+        elif token_type == TokenType.CONTENT:
+            self.handle_content(value)
+        elif token_type == TokenType.CHAPTER_CLOSE:
+            self.handle_chapter_close()
+        elif token_type == TokenType.SUBCHAPTER_CLOSE:
+            self.handle_subchapter_close()
+        elif token_type == TokenType.DOCUMENT_CLOSE:
+            self.handle_document_close()
 
-        Returns:
-            - list: A list of Token objects representing the predefined tokens.
-        """
-        return self.tokens
-
-    def print_tokens(self):
-        """
-        Prints the list of predefined tokens.
-        """
-        print(self.tokens)
+    def handle_chapter_open(self):
+        chapter_node = ASTNode(TokenType.CHAPTER_OPEN)
+        self.current_node.children.append(chapter_node)
+        self.stack.append(chapter_node)
+        self.current_node = chapter_node
 ```
 
-### Lexer class
-This class is a wrapper around the Tokenizer class and it encapsulates the Tokenizer class to be easier to use.
-```python
-from FileReader import FileReader
-from Tokenizer import Tokenizer
-
-class Lexer:
-    """
-    The Lexer class is responsible for tokenizing input lines from a file.
-
-    Args:
-        - file_path (str): The path to the input file.
-
-    Attributes:
-        - lines (FileReader): An instance of the FileReader class to read lines from the file.
-        - tokens (Tokenizer): An instance of the Tokenizer class to tokenize the lines.
-
-    Methods:
-        - tokenize(): Tokenizes each line from the file and prints the resulting tokens.
-    """
-
-    def __init__(self, file_path: str):
-        self.lines = FileReader(file_path=file_path)
-        self.tokens = Tokenizer()
-        
-    def tokenize(self):
-        """
-        Tokenizes each line from the file and prints the resulting tokens.
-        """
-        self.tokens = [self.tokens.tokenize(line) for line in self.lines.get()]
-        
-    def get_tokens(self):
-        """
-        Returns the list of predefined tokens.
-
-        Returns:
-            - list: A list of Token objects representing the predefined tokens.
-        """
-        self.tokenize()
-        return self.tokens
-    
-    def print_tokens(self):
-        """
-        Prints the list of predefined tokens.
-        """
-        self.tokenize()
-        for line in self.tokens:
-            print(line)
-```
-
+### Execution and result
 To test and present this lab, I have created a file ```example.flexksx``` with following lines. It has a very simple syntax.
-```bash
-print("Hello");
-print("Hi world");
-for(i=0;i<5;i+=1) {print("Hello world")}
+```
+[document]
+[title]
+    This is the title of the document!
+[/title]
+[chapter] 
+    The following text is the content of my chapter
+        [subchapter]
+            You can also add subchapters!
+        [/subchapter]
+    That will be in the content of the chapter
+[/chapter]
+[/document]
 ```
 
-The tokenization of this code results in this output: 
-```python
-[(print, 'print'), (lparen, '('), (quote, '"'), (identifier, 'Hello'), (quote, '"'), (rparen, ')'), (semicolon, ';')]
-[(print, 'print'), (lparen, '('), (quote, '"'), (identifier, 'Hi'), (identifier, 'world'), (quote, '"'), (rparen, ')'), (semicolon, ';')]
-[(for, 'for'), (lparen, '('), (identifier, 'i'), (assign, '='), (int_literal, '0'), (semicolon, ';'), (identifier, 'i'), (less, '<'), (int_literal, '5'), (semicolon, ';'), (identifier, 'i'), (plus, '+'), (assign, '='), (int_literal, '1'), (rparen, ')'), (lbrace, '{'), (print, 'print'), (lparen, '('), (quote, '"'), (identifier, 'Hello'), (identifier, 'world'), (quote, '"'), (rparen, ')'), (rbrace, '}')]
-```
-Where, each token is put into the line it contains, and put into a set with the token type first and the token value second.
+The processing of such code will result in the following tree:
+![alt text](image.png)
 
-## Conclusions
-The program successfully converted my custom written code into tokens that can be further used for future implementations. It used Regular Expressions used from a Python library to implement the identification of certain symbol patterns that represent tokens in order to achieve the desired tokenization.
+Where we can clearly see a hierarchy of the document structure defined in the custom language. We observe that the document opens, then it has a title, then inside the title there is a chapter defined, which has its content, a subchapter with its own distinct content, and the content that follows after the subchapter. This indicates that the execution was correct and we achieved the purpose of parsing and building an AST Tree.
+
+## Conclusion
+In conclusion, this laboratory work provided an in-depth exploration of parsing techniques and abstract syntax trees (ASTs), fundamental concepts in formal language processing. Through the implementation of a lexer and parser for a custom markup language, the lab aimed to demonstrate practical applications of parsing methodologies. By defining a TokenType enumeration and employing regular expressions for token identification, the lexer efficiently transformed markdown text into a sequence of tokens. Subsequently, the Parser class orchestrated the construction of an AST from the token stream, utilizing hierarchical document structures defined in the input markdown. The modular design of the Parser class facilitated extensibility and maintainability, while the ASTNode class provided a flexible representation of nodes within the AST. Execution of the lab's example code successfully produced an AST reflecting the hierarchical structure of the input document, validating the efficacy of the parsing process. Overall, the lab underscored the importance of parsing techniques and ASTs in formal language processing, laying a solid foundation for further exploration and application in compiler construction and program analysis domains.
+
+
+
+
+

@@ -1,0 +1,17 @@
+digraph {
+	4348950240 [label="DOCUMENT_OPEN(ROOT)"]
+	4349040768 [label=TITLE_OPEN]
+	4348950240 -> 4349040768
+	4349039136 [label="CONTENT(This is the title of the document!)"]
+	4349040768 -> 4349039136
+	4349040192 [label=CHAPTER_OPEN]
+	4349040768 -> 4349040192
+	4349038464 [label="CONTENT(The following text is the content of my chapter)"]
+	4349040192 -> 4349038464
+	4349039184 [label=SUBCHAPTER_OPEN]
+	4349040192 -> 4349039184
+	4349040240 [label="CONTENT(You can also add subchapters!)"]
+	4349039184 -> 4349040240
+	4349039856 [label="CONTENT(That will be in the content of the chapter)"]
+	4349040192 -> 4349039856
+}

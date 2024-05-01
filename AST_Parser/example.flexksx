@@ -1,5 +1,12 @@
-print("Hello");
-print("Hi world");
-for(i=0;i<5;i+=1){
-    print("Hello world");
-}
+[document]
+[title]
+    This is the title of the document!
+[/title]
+[chapter] 
+    The following text is the content of my chapter
+        [subchapter]
+            You can also add subchapters!
+        [/subchapter]
+    That will be in the content of the chapter
+[/chapter]
+[/document]

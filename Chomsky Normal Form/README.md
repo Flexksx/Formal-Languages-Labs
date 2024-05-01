@@ -15,7 +15,7 @@ Also, neither B nor C may be the start symbol, and the third production rule can
 Every grammar in Chomsky normal form is context-free, and conversely, every context-free grammar can be transformed into an equivalent one which is in Chomsky normal form and has a size no larger than the square of the original grammar's size.
 
 ## Objectives:
-1. Learn about Chomsky Normal Form (CNF) [1].
+1. Learn about Chomsky Normal Form (CNF).
 2. Get familiar with the approaches of normalizing a grammar.
 3. Implement a method for normalizing an input grammar by the rules of CNF.
     1. The implementation needs to be encapsulated in a method with an appropriate signature (also ideally in an appropriate class/type).
